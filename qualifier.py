@@ -14,10 +14,10 @@ Important notes for submission:
   solution.
 """
 import datetime
+import itertools
+import string
 import typing
 from collections import Counter
-import string
-import itertools
 from functools import total_ordering
 
 
@@ -27,15 +27,15 @@ class ArticleField:
     def __init__(self, field_type: typing.Type[typing.Any]):
         self.field_type = field_type
 
-    def __get__(self, obj, value):
-        return self.attribute
+    def __get__(self, obj, objtype):
+        return obj.__dict__['attribute']
 
     def __set__(self, obj, value):
         if isinstance(value, self.field_type):
-            self.attribute = value
+            obj.__dict__['attribute'] = value
         else:
             raise TypeError(
-                f"expected an instance of type '{self.field_type.__name__}' for attribute '{obj.__self__}', got '{type(value).__name__}' instead")
+                f"expected an instance of type '{self.field_type.__name__}' for attribute 'attribute', got '{type(value).__name__}' instead")
 
 
 @total_ordering
