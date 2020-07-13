@@ -15,17 +15,75 @@ Important notes for submission:
 """
 import datetime
 import typing
+from collections import Counter
+import string
+import itertools
+from functools import total_ordering
 
 
 class ArticleField:
     """The `ArticleField` class for the Advanced Requirements."""
 
     def __init__(self, field_type: typing.Type[typing.Any]):
-        pass
+        self.field_type = field_type
+
+    def __get__(self, obj, value):
+        return self.attribute
+
+    def __set__(self, obj, value):
+        if isinstance(value, self.field_type):
+            self.attribute = value
+        else:
+            raise TypeError(
+                f"expected an instance of type '{self.field_type.__name__}' for attribute '{obj.__self__}', got '{type(value).__name__}' instead")
 
 
+@total_ordering
 class Article:
     """The `Article` class you need to write for the qualifier."""
 
+    id_iter = itertools.count()
+
     def __init__(self, title: str, author: str, publication_date: datetime.datetime, content: str):
-        pass
+        self.id = next(self.id_iter)
+        self.title = title
+        self.author = author
+        self.content = content
+        self.publication_date = publication_date
+        self.last_edited = None
+
+    def __repr__(self):
+        return f"<Article title=\"{self.title}\" author='{self.author}' publication_date='{self.publication_date.isoformat()}'>"
+
+    def __len__(self):
+        return len(self.content)
+
+    def __lt__(self, value):
+        return self.publication_date < value.publication_date
+
+    @property
+    def content(self):
+        return self._content
+
+    @content.setter
+    def content(self, value):
+        self._content = value
+        self.last_edited = datetime.datetime.now()
+
+    def short_introduction(self, n_characters: int):
+        content_word_list = self.content.split()
+        new_content_list = []
+        for word in content_word_list:
+            word_len = len(word)
+            if word_len > n_characters:
+                break
+            n_characters -= word_len + 1
+            new_content_list.append(word)
+        return " ".join(new_content_list)
+
+    def most_common_words(self, n_words: int):
+        translator = str.maketrans(
+            string.punctuation, ' ' * len(string.punctuation))
+        clean_content = self.content.translate(translator).lower()
+        word_counts = Counter(clean_content.split())
+        return dict(word_counts.most_common(n_words))
