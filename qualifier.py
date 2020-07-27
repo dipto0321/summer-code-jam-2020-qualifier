@@ -83,5 +83,7 @@ class Article:
         translator = str.maketrans(
             string.punctuation, ' ' * len(string.punctuation))
         clean_content = self.content.translate(translator).lower()
-        word_counts = Counter(clean_content.split())
-        return dict(word_counts.most_common(n_words))
+        words = clean_content.split()
+        word_counts = Counter(words)
+        most_commmon_words = dict(word_counts.most_common(n_words))
+        return most_commmon_words
