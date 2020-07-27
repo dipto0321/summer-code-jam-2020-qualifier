@@ -26,16 +26,28 @@ class ArticleField:
 
     def __init__(self, field_type: Type[Any]):
         self.field_type = field_type
+        self.attribute_name = None
 
-    def __get__(self, obj: Any, objtype: Any):
-        return obj.__dict__['attribute']
-
-    def __set__(self, obj: Any, value: Any):
-        if isinstance(value, self.field_type):
-            obj.__dict__['attribute'] = value
+    def __get__(self, instance: Any, owner: Any):
+        try:
+            value = instance.__dict__[self.attribute_name]
+        except KeyError:
+            raise AttributeError from None
         else:
+            return value
+
+    def __set__(self, instance: Any, value: Any):
+        if isinstance(value, self.field_type):
+            instance.__dict__[self.attribute_name] = value
+        else:
+            expected_type = self.field_type.__name__
+            actual_type = type(value).__name__
             raise TypeError(
-                f"expected an instance of type '{self.field_type.__name__}' for attribute 'attribute', got '{type(value).__name__}' instead")
+                f"expected an instance of type '{expected_type}' for attribute '{self.attribute_name}', got '{actual_type}' instead")
+
+    def __set_name__(self, owner: Any, name: str):
+        if self.attribute_name is None:
+            self.attribute_name = name
 
 
 @total_ordering
