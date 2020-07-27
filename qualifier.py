@@ -53,7 +53,9 @@ class Article:
         self.last_edited = None
 
     def __repr__(self):
-        return f"<Article title=\"{self.title}\" author='{self.author}' publication_date='{self.publication_date.isoformat()}'>"
+        cls_name = self.__class__.__name__
+        publication_date = self.publication_date.isoformat()
+        return f"<{cls_name} title={self.title!r} author={self.author!r} publication_date={publication_date!r}>"
 
     def __len__(self):
         return len(self.content)
@@ -66,20 +68,16 @@ class Article:
         return self._content
 
     @content.setter
-    def content(self, value):
+    def content(self, value: str):
         self._content = value
         self.last_edited = datetime.datetime.now()
 
     def short_introduction(self, n_characters: int):
-        content_word_list = self.content.split()
-        new_content_list = []
-        for word in content_word_list:
-            word_len = len(word)
-            if word_len > n_characters:
-                break
-            n_characters -= word_len + 1
-            new_content_list.append(word)
-        return " ".join(new_content_list)
+        short_content = self.content[:n_characters+1]
+        rightmost_space = short_content.rfind(' ')
+        rightmost_newline = short_content.rfind('\n')
+        rightmost_seperator = max((rightmost_space, rightmost_newline))
+        return short_content[:rightmost_seperator]
 
     def most_common_words(self, n_words: int):
         translator = str.maketrans(
