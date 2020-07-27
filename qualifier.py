@@ -16,7 +16,7 @@ Important notes for submission:
 import datetime
 import itertools
 import string
-import typing
+from typing import Type, Any
 from collections import Counter
 from functools import total_ordering
 
@@ -24,13 +24,13 @@ from functools import total_ordering
 class ArticleField:
     """The `ArticleField` class for the Advanced Requirements."""
 
-    def __init__(self, field_type: typing.Type[typing.Any]):
+    def __init__(self, field_type: Type[Any]):
         self.field_type = field_type
 
-    def __get__(self, obj, objtype):
+    def __get__(self, obj: Any, objtype: Any):
         return obj.__dict__['attribute']
 
-    def __set__(self, obj, value):
+    def __set__(self, obj: Any, value: Any):
         if isinstance(value, self.field_type):
             obj.__dict__['attribute'] = value
         else:
@@ -48,7 +48,7 @@ class Article:
         self.id = next(self.article_ids)
         self.title = title
         self.author = author
-        self.content = content
+        self._content = content
         self.publication_date = publication_date
         self.last_edited = None
 
@@ -60,7 +60,7 @@ class Article:
     def __len__(self):
         return len(self.content)
 
-    def __lt__(self, value):
+    def __lt__(self, value: Any):
         return self.publication_date < value.publication_date
 
     @property
