@@ -61,6 +61,8 @@ class Article:
         return len(self.content)
 
     def __lt__(self, value: Any):
+        if not isinstance(value, Article):
+            return NotImplemented
         return self.publication_date < value.publication_date
 
     @property
